@@ -1,0 +1,393 @@
+---
+import MainLayout from "../../layouts/MainLayout.astro";
+import ContentCard from "../../components/ContentCard.astro";
+import { getAbsoluteUrl, siteConfig } from "../../config/site";
+import { buildWhatsAppUrl, getContactSettings, getWhatsAppShareUrl } from "../../lib/contact";
+import { formatContentDate } from "../../lib/dates";
+import { getContents } from "../../lib/wordpress";
+import type { AudiovisualContent } from "../../types/content";
+
+interface StaticPathProps {
+  item: AudiovisualContent;
+  contents: AudiovisualContent[];
+}
+
+export async function getStaticPaths() {
+  const contents = await getContents();
+
+  return contents.map((item) => ({
+    params: { slug: item.slug },
+    props: {
+      item,
+      contents,
+    } satisfies StaticPathProps,
+  }));
+}
+
+const { item, contents } = Astro.props as StaticPathProps;
+const contactSettings = await getContactSettings();
+
+const relatedContents = contents
+  .filter((content) => content.slug !== item.slug)
+  .filter((content) => content.category === item.category)
+  .slice(0, 3);
+
+const fallbackRelatedContents = contents
+  .filter((content) => content.slug !== item.slug)
+  .slice(0, 3);
+
+const finalRelatedContents =
+  relatedContents.length > 0 ? relatedContents : fallbackRelatedContents;
+
+const isVideo = item.type === "video";
+const displayDate = formatContentDate(item.date);
+const formatLabel = isVideo ? "Video audiovisual" : "Imagen / fotografia";
+const currentUrl = getAbsoluteUrl(`/contenido/${item.slug}`);
+const shareUrl = getWhatsAppShareUrl(
+  `Mira este contenido de ${siteConfig.name}: ${item.title} ${currentUrl}`,
+);
+const requestUrl =
+  buildWhatsAppUrl(
+    contactSettings.whatsappPhone,
+    `Hola, quiero consultar disponibilidad o mas informacion sobre este contenido: ${item.title}. ${currentUrl}`,
+  ) || "/contacto";
+const requestOpensExternally = requestUrl.startsWith("http");
+const currentIndex = contents.findIndex((content) => content.slug === item.slug);
+const hasNavigation = contents.length > 1 && currentIndex >= 0;
+const previousContent = hasNavigation
+  ? contents[(currentIndex - 1 + contents.length) % contents.length]
+  : undefined;
+const nextContent = hasNavigation
+  ? contents[(currentIndex + 1) % contents.length]
+  : undefined;
+---
+
+<MainLayout
+  title={`${item.title} - ${siteConfig.name}`}
+  description={item.description}
+  image={item.image}
+  url={currentUrl}
+>
+  <main class="bg-[#08090a]">
+    <section class="relative overflow-hidden border-b border-white/[0.08]">
+      <img
+        src={item.image}
+        alt={item.title}
+        loading="eager"
+        decoding="async"
+        width="1600"
+        height="1000"
+        class="absolute inset-0 h-full w-full object-cover opacity-20"
+      />
+
+      <div class="absolute inset-0 bg-[linear-gradient(135deg,rgba(10,10,10,0.98)_35%,rgba(10,10,10,0.82)_70%,rgba(0,224,199,0.12)_100%)]"></div>
+
+      <div class="relative z-10 mx-auto max-w-[75rem] px-6 py-16 md:py-24">
+        <a
+          href="/galeria"
+          class="inline-flex items-center rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-sm font-bold text-zinc-400 transition hover:border-[#00e0c7]/40 hover:text-white"
+        >
+          &larr; Volver a galeria
+        </a>
+
+        <div class="mt-10 grid gap-8 lg:grid-cols-[1fr_380px] lg:items-end">
+          <div>
+            <div class="mb-6 flex flex-wrap gap-3">
+              <span class="rounded-lg bg-[#00e0c7] px-4 py-2 text-xs font-black uppercase tracking-wider text-black">
+                {isVideo ? "Video" : "Foto"}
+              </span>
+
+              <span class="rounded-lg border border-[#00e0c7]/30 bg-[#00e0c7]/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-[#00e0c7]">
+                {item.category}
+              </span>
+
+              {
+                item.featured && (
+                  <span class="rounded-lg border border-white/[0.1] bg-white/[0.06] px-4 py-2 text-xs font-black uppercase tracking-wider text-white">
+                    Destacado
+                  </span>
+                )
+              }
+            </div>
+
+            <h1 class="max-w-5xl text-4xl font-black leading-[0.98] text-white md:text-7xl">
+              {item.title}
+            </h1>
+
+            <p class="mt-7 max-w-3xl text-lg leading-8 text-zinc-400">
+              {item.description}
+            </p>
+
+            <div class="mt-8 flex flex-wrap gap-3">
+              {
+                isVideo && item.videoUrl ? (
+                  <a
+                    href={item.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn-main"
+                  >
+                    Ver video ->
+                  </a>
+                ) : (
+                  <a href="#contenido" class="btn-main">
+                    Ver imagen
+                  </a>
+                )
+              }
+
+              <a
+                href={requestUrl}
+                target={requestOpensExternally ? "_blank" : undefined}
+                rel={requestOpensExternally ? "noopener noreferrer" : undefined}
+                class="btn-ghost"
+              >
+                Solicitar este material
+              </a>
+            </div>
+          </div>
+
+          <aside class="rounded-lg border border-white/[0.08] bg-[#101315]/80 p-5 backdrop-blur">
+            <p class="section-eyebrow">Ficha rapida</p>
+
+            <dl class="mt-5 grid gap-4">
+              <div class="border-b border-white/[0.08] pb-4">
+                <dt class="text-xs font-black uppercase tracking-[0.18em] text-zinc-600">
+                  Ubicacion
+                </dt>
+                <dd class="mt-2 font-bold text-white">{item.location}</dd>
+              </div>
+
+              <div class="border-b border-white/[0.08] pb-4">
+                <dt class="text-xs font-black uppercase tracking-[0.18em] text-zinc-600">
+                  Fecha
+                </dt>
+                <dd class="mt-2 font-bold text-white">{displayDate}</dd>
+              </div>
+
+              <div>
+                <dt class="text-xs font-black uppercase tracking-[0.18em] text-zinc-600">
+                  Formato
+                </dt>
+                <dd class="mt-2 font-bold text-white">{formatLabel}</dd>
+              </div>
+            </dl>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="contenido" class="px-6 py-14 md:py-20">
+      <div class="mx-auto grid max-w-[75rem] gap-8 lg:grid-cols-[1fr_340px]">
+        <div>
+          <figure class="overflow-hidden rounded-lg border border-white/[0.08] bg-[#101315]">
+            <div class="relative">
+              <img
+                src={item.image}
+                alt={item.title}
+                loading="eager"
+                decoding="async"
+                width="1400"
+                height="900"
+                class="max-h-[760px] w-full object-cover"
+              />
+
+              {
+                isVideo && (
+                  <div class="absolute inset-0 flex items-center justify-center bg-black/10">
+                    <span class="flex h-16 w-16 items-center justify-center rounded-full border border-white/20 bg-black/70 text-xl font-black text-white backdrop-blur">
+                      ▶
+                    </span>
+                  </div>
+                )
+              }
+            </div>
+
+            <figcaption class="border-t border-white/[0.08] px-5 py-4 text-sm text-zinc-500">
+              {item.title} - {item.location} - {displayDate}
+            </figcaption>
+          </figure>
+
+          <div class="mt-8 rounded-lg border border-white/[0.08] bg-[#101315] p-6 md:p-8">
+            <p class="section-eyebrow">Resumen</p>
+
+            <div class="mt-5 space-y-5 text-lg leading-8 text-zinc-400">
+              <p>{item.description}</p>
+            </div>
+
+            {
+              isVideo && item.videoUrl && (
+                <div class="mt-8 border-t border-white/[0.08] pt-6">
+                  <a
+                    href={item.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn-main"
+                  >
+                    Ver video ->
+                  </a>
+                </div>
+              )
+            }
+          </div>
+        </div>
+
+        <aside class="lg:sticky lg:top-28 lg:self-start">
+          <div class="rounded-lg border border-white/[0.08] bg-[#101315] p-6">
+            <p class="section-eyebrow">Detalles</p>
+
+            <div class="mt-6 space-y-5">
+              <div>
+                <p class="text-xs font-black uppercase tracking-[0.2em] text-zinc-600">
+                  Titulo
+                </p>
+                <p class="mt-2 font-bold text-white">{item.title}</p>
+              </div>
+
+              <div class="border-t border-white/[0.08] pt-5">
+                <p class="text-xs font-black uppercase tracking-[0.2em] text-zinc-600">
+                  Categoria
+                </p>
+                <p class="mt-2 font-bold text-[#00e0c7]">{item.category}</p>
+              </div>
+
+              <div class="border-t border-white/[0.08] pt-5">
+                <p class="text-xs font-black uppercase tracking-[0.2em] text-zinc-600">
+                  Tipo
+                </p>
+                <p class="mt-2 font-bold text-white">
+                  {isVideo ? "Video" : "Foto"}
+                </p>
+              </div>
+
+              <div class="border-t border-white/[0.08] pt-5">
+                <p class="text-xs font-black uppercase tracking-[0.2em] text-zinc-600">
+                  Fecha
+                </p>
+                <p class="mt-2 font-bold text-white">{displayDate}</p>
+              </div>
+
+              <div class="border-t border-white/[0.08] pt-5">
+                <p class="text-xs font-black uppercase tracking-[0.2em] text-zinc-600">
+                  Ubicacion
+                </p>
+                <p class="mt-2 font-bold text-white">{item.location}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-5 rounded-lg border border-[#00e0c7]/20 bg-[#00e0c7]/10 p-6">
+            <h2 class="text-xl font-black text-white">
+              Acciones rapidas
+            </h2>
+
+            <p class="mt-3 text-sm leading-6 text-zinc-400">
+              Comparte esta publicacion o escribenos para consultar disponibilidad del material.
+            </p>
+
+            <div class="mt-6 grid gap-3">
+              <a href={shareUrl} target="_blank" rel="noopener noreferrer" class="btn-main">
+                Compartir por WhatsApp
+              </a>
+
+              <a
+                href={requestUrl}
+                target={requestOpensExternally ? "_blank" : undefined}
+                rel={requestOpensExternally ? "noopener noreferrer" : undefined}
+                class="btn-ghost"
+              >
+                Solicitar material
+              </a>
+
+              <a href="/galeria" class="btn-ghost">
+                Ver mas en galeria
+              </a>
+            </div>
+          </div>
+
+          {
+            hasNavigation && (
+              <div class="mt-5 rounded-lg border border-white/[0.08] bg-[#101315] p-6">
+                <p class="section-eyebrow">Navegar</p>
+
+                <div class="mt-5 grid gap-3">
+                  {previousContent && (
+                    <a
+                      href={`/contenido/${previousContent.slug}`}
+                      class="rounded-lg border border-white/[0.08] bg-white/[0.035] p-4 transition hover:border-[#00e0c7]/40"
+                    >
+                      <p class="text-xs font-black uppercase tracking-[0.18em] text-zinc-600">
+                        Anterior
+                      </p>
+                      <p class="mt-2 line-clamp-2 font-bold text-white">
+                        {previousContent.title}
+                      </p>
+                    </a>
+                  )}
+
+                  {nextContent && (
+                    <a
+                      href={`/contenido/${nextContent.slug}`}
+                      class="rounded-lg border border-white/[0.08] bg-white/[0.035] p-4 transition hover:border-[#00e0c7]/40"
+                    >
+                      <p class="text-xs font-black uppercase tracking-[0.18em] text-zinc-600">
+                        Siguiente
+                      </p>
+                      <p class="mt-2 line-clamp-2 font-bold text-white">
+                        {nextContent.title}
+                      </p>
+                    </a>
+                  )}
+                </div>
+              </div>
+            )
+          }
+        </aside>
+      </div>
+    </section>
+
+    <section class="border-t border-white/[0.08] bg-[#101315] px-6 py-20 md:py-24">
+      <div class="mx-auto max-w-[75rem]">
+        <div class="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <div>
+            <p class="section-eyebrow">Relacionado</p>
+
+            <h2 class="mt-4 section-title">
+              Mas contenido para explorar
+            </h2>
+          </div>
+
+          <a href="/galeria" class="btn-ghost">
+            Ver galeria completa ->
+          </a>
+        </div>
+
+        {
+          finalRelatedContents.length > 0 ? (
+            <div class="grid gap-6 md:grid-cols-3">
+              {finalRelatedContents.map((content) => (
+                <ContentCard item={content} />
+              ))}
+            </div>
+          ) : (
+            <div class="grid gap-5 md:grid-cols-[1fr_auto] md:items-center">
+              <div class="dark-card p-8">
+                <p class="section-eyebrow">Archivo en crecimiento</p>
+                <h3 class="mt-4 text-2xl font-black text-white">
+                  Todavia no hay publicaciones relacionadas
+                </h3>
+                <p class="mt-3 max-w-2xl leading-7 text-zinc-500">
+                  Cuando WordPress tenga mas contenido de esta categoria, se mostrara aqui automaticamente.
+                </p>
+              </div>
+
+              <a href="/galeria" class="btn-main">
+                Explorar galeria
+              </a>
+            </div>
+          )
+        }
+      </div>
+    </section>
+  </main>
+</MainLayout>

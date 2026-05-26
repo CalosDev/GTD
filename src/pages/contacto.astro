@@ -1,0 +1,203 @@
+---
+import SocialLinks from "../components/SocialLinks.astro";
+import MainLayout from "../layouts/MainLayout.astro";
+import { siteConfig } from "../config/site";
+import { buildWhatsAppUrl, getContactSettings, socialPlatforms } from "../lib/contact";
+import { getPageBySlug } from "../lib/wordpress";
+
+const managedPage = await getPageBySlug("contacto");
+const contactSettings = await getContactSettings();
+const whatsappUrl = contactSettings.whatsappUrl;
+const pageTitle =
+  managedPage?.title || `Solicita informacion o comunicate directamente con ${siteConfig.name}`;
+const pageExcerpt =
+  managedPage?.excerpt ||
+  "Elige el motivo de tu consulta para escribir por WhatsApp con un mensaje mas claro desde el inicio.";
+
+const contactOptions = [
+  {
+    title: "Solicitar contenido",
+    description: "Pregunta por disponibilidad de fotos, videos o publicaciones especificas.",
+    message: `Hola, quiero solicitar informacion sobre contenido disponible de ${siteConfig.name}.`,
+  },
+  {
+    title: "Coordinar cobertura",
+    description: "Escribe si quieres consultar una posible cobertura o publicacion audiovisual.",
+    message: "Hola, quiero consultar sobre una posible cobertura o publicacion audiovisual.",
+  },
+  {
+    title: "Consultar material",
+    description: "Usa esta opcion si buscas material de una actividad, fecha o categoria concreta.",
+    message: "Hola, estoy buscando material de una actividad especifica. Me pueden ayudar?",
+  },
+  {
+    title: "Reportar publicacion",
+    description: "Comunica cualquier correccion sobre titulo, categoria, fecha o informacion publicada.",
+    message: `Hola, quiero reportar una correccion sobre una publicacion de ${siteConfig.name}.`,
+  },
+];
+---
+
+<MainLayout
+  title={`Contacto - ${siteConfig.name}`}
+  description={pageExcerpt}
+>
+  <main class="bg-[#08090a]">
+    <section class="relative overflow-hidden border-b border-white/[0.08] px-6 py-20 md:py-28">
+      <div class="absolute inset-0 bg-[linear-gradient(180deg,#101315,#08090a)]"></div>
+
+      <div class="relative z-10 mx-auto max-w-[75rem]">
+        <p class="section-eyebrow">
+          Contacto
+        </p>
+
+        <h1 class="mt-5 max-w-4xl text-4xl font-black leading-tight text-white md:text-6xl">
+          {pageTitle}
+        </h1>
+
+        <p class="mt-6 max-w-3xl text-lg leading-8 text-zinc-400">
+          {pageExcerpt}
+        </p>
+      </div>
+    </section>
+
+    {
+      managedPage?.contentHtml && (
+        <section class="section-band">
+          <div class="container-site">
+            <div class="dark-card p-8 md:p-10">
+              <div class="rich-content" set:html={managedPage.contentHtml}></div>
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    <section class="section-band">
+      <div class="container-site grid gap-5 md:grid-cols-2">
+        <div class="dark-card p-8">
+          <h2 class="text-2xl font-bold text-white">Contacto directo</h2>
+
+          <p class="mt-4 leading-7 text-zinc-500">
+            Para una respuesta mas rapida, puedes comunicarte directamente por WhatsApp.
+          </p>
+
+          {
+            whatsappUrl ? (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-8 btn-main"
+              >
+                Escribir por WhatsApp
+              </a>
+            ) : (
+              <p class="mt-8 rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-sm text-zinc-400">
+                Agrega un enlace de WhatsApp dentro del contenido de esta pagina en WordPress para
+                activar el contacto directo.
+              </p>
+            )
+          }
+        </div>
+
+        <div class="dark-card p-8">
+          <h2 class="text-2xl font-bold text-white">Informacion</h2>
+
+          <div class="mt-6 space-y-5 text-zinc-400">
+            <div>
+              <p class="text-xs font-black uppercase tracking-[0.18em] text-zinc-600">
+                Ubicacion
+              </p>
+              <p class="mt-2 text-white">{siteConfig.location}</p>
+            </div>
+
+            <div class="border-t border-white/[0.08] pt-5">
+              <p class="text-xs font-black uppercase tracking-[0.18em] text-zinc-600">
+                Tipo de contenido
+              </p>
+              <p class="mt-2 text-white">Imagenes, videos, reels y publicaciones audiovisuales</p>
+            </div>
+
+            <div class="border-t border-white/[0.08] pt-5">
+              <p class="text-xs font-black uppercase tracking-[0.18em] text-zinc-600">
+                Categorias
+              </p>
+              <p class="mt-2 text-white">Entrenamientos, marchas, desfiles, comandos y actividades militares</p>
+            </div>
+
+            <div class="border-t border-white/[0.08] pt-5">
+              <p class="text-xs font-black uppercase tracking-[0.18em] text-zinc-600">
+                Canales sociales
+              </p>
+              <div class="mt-4">
+                <SocialLinks
+                  links={contactSettings.socialLinks.length > 0 ? contactSettings.socialLinks : socialPlatforms.map((item) => ({ ...item, url: "" }))}
+                  showLabels={true}
+                  showDisabled={contactSettings.socialLinks.length === 0}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="border-t border-white/[0.08] bg-[#101315] px-6 py-20">
+      <div class="mx-auto max-w-[75rem]">
+        <div class="mb-10 max-w-3xl">
+          <p class="section-eyebrow">Opciones de consulta</p>
+          <h2 class="mt-4 section-title">
+            Que necesitas hacer?
+          </h2>
+          <p class="mt-4 leading-7 text-zinc-400">
+            Cada opcion abre WhatsApp con un mensaje preparado para reducir vueltas y responder mas rapido.
+          </p>
+        </div>
+
+        <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {
+            contactOptions.map((option) => {
+              const optionUrl = buildWhatsAppUrl(contactSettings.whatsappPhone, option.message);
+
+              return optionUrl ? (
+                <a
+                  href={optionUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="dark-card media-lift flex min-h-[220px] flex-col justify-between p-6"
+                >
+                  <div>
+                    <p class="text-xs font-black uppercase tracking-[0.18em] text-[#00e0c7]">
+                      WhatsApp
+                    </p>
+                    <h3 class="mt-4 text-xl font-black text-white">{option.title}</h3>
+                    <p class="mt-3 text-sm leading-6 text-zinc-400">{option.description}</p>
+                  </div>
+
+                  <span class="mt-6 text-sm font-bold text-white">
+                    Escribir ->
+                  </span>
+                </a>
+              ) : (
+                <div class="dark-card flex min-h-[220px] flex-col justify-between p-6 opacity-75">
+                  <div>
+                    <p class="text-xs font-black uppercase tracking-[0.18em] text-zinc-600">
+                      WhatsApp no configurado
+                    </p>
+                    <h3 class="mt-4 text-xl font-black text-white">{option.title}</h3>
+                    <p class="mt-3 text-sm leading-6 text-zinc-400">{option.description}</p>
+                  </div>
+
+                  <span class="mt-6 text-sm font-bold text-zinc-500">
+                    Configuralo en WordPress
+                  </span>
+                </div>
+              );
+            })
+          }
+        </div>
+      </div>
+    </section>
+  </main>
+</MainLayout>

@@ -1,0 +1,70 @@
+---
+import SocialLinks from "./SocialLinks.astro";
+import type { ContactSettings } from "../types/contact";
+import { siteConfig } from "../config/site";
+
+interface Props {
+  contactSettings: ContactSettings;
+}
+
+const { contactSettings } = Astro.props;
+---
+
+<footer class="border-t border-white/[0.08] bg-[#08090a]">
+  <div class="container-site grid gap-10 py-12 md:grid-cols-[1.4fr_1fr_1fr]">
+    <div>
+      <a href="/" class="focus-ring inline-flex items-center gap-3 rounded-lg">
+        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#00e0c7] text-sm font-black text-black">
+          {siteConfig.logoText}
+        </span>
+
+        <span class="text-base font-bold text-white">{siteConfig.name}</span>
+      </a>
+
+      <p class="mt-5 max-w-sm text-sm leading-6 text-zinc-500">
+        {siteConfig.description}
+      </p>
+
+      {
+        contactSettings.socialLinks.length > 0 && (
+          <div class="mt-6">
+            <p class="text-xs font-black uppercase tracking-[0.18em] text-zinc-500">
+              Canales
+            </p>
+            <div class="mt-4">
+              <SocialLinks links={contactSettings.socialLinks} size="sm" />
+            </div>
+          </div>
+        )
+      }
+    </div>
+
+    <div>
+      <h3 class="text-xs font-black uppercase tracking-[0.18em] text-zinc-500">
+        Navegación
+      </h3>
+
+      <div class="mt-5 flex flex-col gap-3 text-sm text-zinc-400">
+        <a href="/" class="transition hover:text-white">Home</a>
+        <a href="/sobre-nosotros" class="transition hover:text-white">Sobre nosotros</a>
+        <a href="/galeria" class="transition hover:text-white">Galería</a>
+        <a href="/contacto" class="transition hover:text-white">Contacto</a>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="text-xs font-black uppercase tracking-[0.18em] text-zinc-500">
+        Legal
+      </h3>
+
+      <div class="mt-5 flex flex-col gap-3 text-sm text-zinc-400">
+        <a href="/privacidad" class="transition hover:text-white">Política de privacidad</a>
+        <a href="/terminos" class="transition hover:text-white">Términos y condiciones</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="border-t border-white/[0.08] px-6 py-5 text-center text-xs text-zinc-600">
+    © {new Date().getFullYear()} {siteConfig.name}. Todos los derechos reservados.
+  </div>
+</footer>

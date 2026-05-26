@@ -1,0 +1,690 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import ContentCard from "../components/ContentCard.astro";
+import { siteConfig } from "../config/site";
+import { getContents, getPagesBySlugs } from "../lib/wordpress";
+
+const contents = await getContents({ includeHomeSlots: true });
+const homePages = await getPagesBySlugs([
+  siteConfig.homeOverviewPageSlug,
+  siteConfig.homeFeaturedPageSlug,
+  siteConfig.homeRecentPageSlug,
+]);
+
+const heroSlotContent = contents.find((item) => item.slug === siteConfig.homeHeroSlug);
+const presentationSlotContent = contents.find(
+  (item) => item.slug === siteConfig.homePresentationSlug,
+);
+const homeOverviewPage = homePages[siteConfig.homeOverviewPageSlug];
+const homeFeaturedPage = homePages[siteConfig.homeFeaturedPageSlug];
+const homeRecentPage = homePages[siteConfig.homeRecentPageSlug];
+
+const visibleContents = contents.filter(
+  (item) =>
+    item.slug !== siteConfig.homeHeroSlug &&
+    item.slug !== siteConfig.homePresentationSlug,
+);
+const featuredContents = visibleContents.filter((item) => item.featured);
+const latestContents = visibleContents.slice(0, 6);
+const heroContent = heroSlotContent || featuredContents[0] || visibleContents[0];
+const presentationContent =
+  presentationSlotContent ||
+  featuredContents.find((item) => item.slug !== heroContent?.slug) ||
+  visibleContents.find((item) => item.slug !== heroContent?.slug) ||
+  heroContent;
+const featuredCarouselItems =
+  featuredContents.length > 0 ? featuredContents.slice(0, 6) : latestContents;
+
+const totalContents = visibleContents.length;
+const totalImages = visibleContents.filter((item) => item.type === "imagen").length;
+const totalCategories = new Set(visibleContents.map((item) => item.category)).size;
+const categoryCount = (query: string) =>
+  visibleContents.filter((item) => item.category.toLowerCase().includes(query)).length;
+const trainingCount = categoryCount("entren");
+const marchCount = categoryCount("marcha") + categoryCount("desfile");
+const activityCount = categoryCount("actividad") + categoryCount("reel");
+
+const siteUrl = siteConfig.url;
+const isDirectVideoUrl = (value = "") => /\.(mp4|webm|ogg)(\?.*)?$/i.test(value);
+const heroUsesVideo =
+  heroContent?.type === "video" && isDirectVideoUrl(heroContent.videoUrl || "");
+const presentationUsesVideo =
+  presentationContent?.type === "video" &&
+  isDirectVideoUrl(presentationContent.videoUrl || "");
+
+const heroEyebrow = heroContent
+  ? [heroContent.category, heroContent.location].filter(Boolean).join(" - ")
+  : `${siteConfig.tagline} - ${siteConfig.location}`;
+const heroHeading = heroContent?.title || siteConfig.name;
+const heroDescription = heroContent?.description || siteConfig.description;
+
+const overviewTitle =
+  homeOverviewPage?.title || "Contenido visual con identidad dominicana";
+const overviewDescription =
+  homeOverviewPage?.excerpt ||
+  "Organizamos el contenido por categorias para que cada visitante pueda encontrar rapidamente imagenes, videos, reels y publicaciones.";
+const overviewBodyHtml = homeOverviewPage?.contentHtml || "";
+
+const presentationEyebrow = presentationContent?.category || "Presentacion";
+const presentationHeading =
+  presentationContent?.title || "Una mirada visual sobre entrenamientos, marchas y actividades";
+const presentationDescription =
+  presentationContent?.description ||
+  `${siteConfig.name} es una plataforma digital dedicada a compartir contenido audiovisual organizado, moderno y facil de consultar.`;
+const presentationLocation = presentationContent?.location || siteConfig.location;
+
+const featuredSectionTitle = homeFeaturedPage?.title || "Contenido destacado";
+const featuredSectionDescription =
+  homeFeaturedPage?.excerpt ||
+  "Una seleccion rapida del material principal para entrar directo a las publicaciones mas relevantes.";
+const recentSectionTitle = homeRecentPage?.title || "Ultimas publicaciones";
+const recentSectionDescription = homeRecentPage?.excerpt || "";
+---
+
+<MainLayout
+  title={`${siteConfig.name} - ${siteConfig.tagline}`}
+  description={heroDescription || siteConfig.description}
+  url={siteUrl}
+>
+  <main class="bg-[#08090a]">
+    <section class="relative flex min-h-[92vh] items-center overflow-hidden">
+      {
+        heroContent &&
+          (heroUsesVideo ? (
+            <video
+              src={heroContent.videoUrl}
+              poster={heroContent.image}
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              class="absolute inset-0 h-full w-full object-cover opacity-45"
+            ></video>
+          ) : (
+            <img
+              src={heroContent.image}
+              alt={heroContent.title}
+              loading="eager"
+              decoding="async"
+              width="1600"
+              height="1000"
+              class="absolute inset-0 h-full w-full object-cover opacity-45"
+            />
+          ))
+      }
+
+      <div class="absolute inset-0 bg-[linear-gradient(135deg,rgba(8,9,10,0.88)_24%,rgba(8,9,10,0.56)_68%,rgba(0,224,199,0.08)_100%)]"></div>
+      <div class="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#08090a] to-transparent"></div>
+
+      <div class="container-site relative z-10 py-24 md:py-28">
+        <div class="max-w-3xl">
+          <div class="mb-8 inline-flex items-center gap-3 rounded-full border border-[#00e0c7]/30 bg-[#00e0c7]/10 px-4 py-2">
+            <span class="h-2 w-2 animate-pulse rounded-full bg-[#00e0c7]"></span>
+            <span class="text-xs font-bold uppercase tracking-[0.18em] text-[#00e0c7]">
+              {heroEyebrow}
+            </span>
+          </div>
+
+          <h1 class="text-5xl font-black leading-[0.95] text-white md:text-7xl">
+            {heroHeading}
+          </h1>
+
+          <p class="mt-8 max-w-xl text-lg leading-8 text-zinc-400">
+            {heroDescription}
+          </p>
+
+          <div class="mt-10 flex flex-wrap gap-4">
+            <a href="/galeria" class="btn-main">
+              Explorar galeria ->
+            </a>
+
+            <a href="/contacto" class="btn-ghost">
+              Solicitar contenido
+            </a>
+          </div>
+        </div>
+
+        <div class="mt-14 grid gap-3 border-t border-white/[0.08] pt-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="rounded-lg border border-white/[0.08] bg-black/25 p-4 backdrop-blur">
+            <p class="text-3xl font-black text-white">{totalContents}</p>
+            <p class="mt-1 text-sm text-zinc-500">Publicaciones</p>
+          </div>
+
+          <div class="rounded-lg border border-white/[0.08] bg-black/25 p-4 backdrop-blur">
+            <p class="text-3xl font-black text-white">{totalImages}</p>
+            <p class="mt-1 text-sm text-zinc-500">Fotos disponibles</p>
+          </div>
+
+          <div class="rounded-lg border border-white/[0.08] bg-black/25 p-4 backdrop-blur">
+            <p class="text-3xl font-black text-white">{totalCategories || 0}</p>
+            <p class="mt-1 text-sm text-zinc-500">Categorias</p>
+          </div>
+
+          <div class="rounded-lg border border-white/[0.08] bg-black/25 p-4 backdrop-blur">
+            <p class="text-3xl font-black text-white">RD</p>
+            <p class="mt-1 text-sm text-zinc-500">{siteConfig.location}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 opacity-40 md:flex">
+        <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-white">
+          Scroll
+        </span>
+        <span class="h-10 w-px bg-gradient-to-b from-white to-transparent"></span>
+      </div>
+    </section>
+
+    <section class="px-6 py-10">
+      <div class="mx-auto grid max-w-[75rem] gap-3 md:grid-cols-3">
+        <a href="#recientes" class="dark-card media-lift block p-5">
+          <p class="text-xs font-black uppercase tracking-[0.18em] text-[#00e0c7]">
+            Reciente
+          </p>
+          <h2 class="mt-3 text-xl font-black text-white">
+            Ver lo ultimo publicado
+          </h2>
+          <p class="mt-2 text-sm leading-6 text-zinc-400">
+            Entra directo al material mas nuevo del archivo.
+          </p>
+        </a>
+
+        <a href="/galeria" class="dark-card media-lift block p-5">
+          <p class="text-xs font-black uppercase tracking-[0.18em] text-[#00e0c7]">
+            Explorar
+          </p>
+          <h2 class="mt-3 text-xl font-black text-white">
+            Buscar por categoria
+          </h2>
+          <p class="mt-2 text-sm leading-6 text-zinc-400">
+            Filtra marchas, entrenamientos y publicaciones disponibles.
+          </p>
+        </a>
+
+        <a href="/contacto" class="dark-card media-lift block p-5">
+          <p class="text-xs font-black uppercase tracking-[0.18em] text-[#00e0c7]">
+            Contacto
+          </p>
+          <h2 class="mt-3 text-xl font-black text-white">
+            Solicitar material
+          </h2>
+          <p class="mt-2 text-sm leading-6 text-zinc-400">
+            Escribe para consultar contenido o coordinar una solicitud.
+          </p>
+        </a>
+      </div>
+    </section>
+
+    <section class="section-band">
+      <div class="container-site">
+        <div class="mb-14 max-w-3xl">
+          <p class="section-eyebrow">Lo que cubrimos</p>
+
+          <h2 class="mt-4 section-title">
+            {overviewTitle}
+          </h2>
+
+          <p class="mt-5 section-text">
+            {overviewDescription}
+          </p>
+        </div>
+
+        {
+          overviewBodyHtml ? (
+            <div class="dark-card p-8 md:p-10">
+              <div class="rich-content" set:html={overviewBodyHtml}></div>
+            </div>
+          ) : (
+            <div class="grid gap-5 md:grid-cols-3">
+              <article class="dark-card media-lift p-8">
+                <div class="mb-8 flex items-start justify-between">
+                  <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-[#00e0c7]/10 text-2xl">
+                    🏋️
+                  </div>
+                  <span class="text-xs font-bold text-zinc-700">
+                    {trainingCount > 0 ? trainingCount : "Nuevo"}
+                  </span>
+                </div>
+
+                <h3 class="text-2xl font-bold text-white">Entrenamientos</h3>
+
+                <p class="mt-4 leading-7 text-zinc-500">
+                  Preparacion fisica, practicas, formacion, disciplina y actividades
+                  de alto rendimiento.
+                </p>
+              </article>
+
+              <article class="dark-card media-lift p-8">
+                <div class="mb-8 flex items-start justify-between">
+                  <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-[#00e0c7]/10 text-2xl">
+                    🎖️
+                  </div>
+                  <span class="text-xs font-bold text-zinc-700">
+                    {marchCount > 0 ? marchCount : "Nuevo"}
+                  </span>
+                </div>
+
+                <h3 class="text-2xl font-bold text-white">Marchas y desfiles</h3>
+
+                <p class="mt-4 leading-7 text-zinc-500">
+                  Cobertura visual de marchas, actos, formaciones, desfiles y eventos
+                  institucionales.
+                </p>
+              </article>
+
+              <article class="dark-card media-lift p-8">
+                <div class="mb-8 flex items-start justify-between">
+                  <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-[#00e0c7]/10 text-2xl">
+                    ⚡
+                  </div>
+                  <span class="text-xs font-bold text-zinc-700">
+                    {activityCount > 0 ? activityCount : "Nuevo"}
+                  </span>
+                </div>
+
+                <h3 class="text-2xl font-bold text-white">Actividades</h3>
+
+                <p class="mt-4 leading-7 text-zinc-500">
+                  Publicaciones, reels, eventos especiales y momentos destacados de
+                  la comunidad.
+                </p>
+              </article>
+            </div>
+          )
+        }
+      </div>
+    </section>
+
+    <section class="px-6 pb-24">
+      <div class="mx-auto max-w-[75rem] overflow-hidden rounded-lg border border-white/[0.08] bg-[#101315]">
+        <div class="grid md:grid-cols-2">
+          <div class="flex flex-col justify-center p-8 md:p-14">
+            <p class="section-eyebrow">{presentationEyebrow}</p>
+
+            <h2 class="mt-4 text-3xl font-black leading-tight text-white md:text-5xl">
+              {presentationHeading}
+            </h2>
+
+            <p class="mt-6 leading-8 text-zinc-400">
+              {presentationDescription}
+            </p>
+
+            <div class="mt-10 grid gap-5 md:grid-cols-3">
+              <div>
+                <h3 class="font-bold text-white">Personas</h3>
+                <p class="mt-2 text-sm leading-6 text-zinc-500">
+                  Historias de preparacion, disciplina y participacion.
+                </p>
+              </div>
+
+              <div>
+                <h3 class="font-bold text-white">Movimiento</h3>
+                <p class="mt-2 text-sm leading-6 text-zinc-500">
+                  Marchas, entrenamientos y momentos capturados.
+                </p>
+              </div>
+
+              <div>
+                <h3 class="font-bold text-white">Comunidad</h3>
+                <p class="mt-2 text-sm leading-6 text-zinc-500">
+                  Contenido cercano para mantener informada a la audiencia.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative min-h-[360px]">
+            {
+              presentationContent &&
+                (presentationUsesVideo ? (
+                  <video
+                    src={presentationContent.videoUrl}
+                    poster={presentationContent.image}
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    preload="metadata"
+                    class="absolute inset-0 h-full w-full object-cover"
+                  ></video>
+                ) : (
+                  <img
+                    src={presentationContent.image}
+                    alt={presentationContent.title}
+                    loading="lazy"
+                    decoding="async"
+                    width="900"
+                    height="700"
+                    class="absolute inset-0 h-full w-full object-cover"
+                  />
+                ))
+            }
+
+            <div class="absolute inset-0 bg-gradient-to-r from-[#101315] via-[#101315]/20 to-transparent md:from-[#101315]"></div>
+
+            <div class="absolute right-6 top-6 rounded-lg border border-white/10 bg-black/70 px-5 py-4 backdrop-blur">
+              <p class="text-xs font-bold uppercase tracking-wider text-zinc-500">
+                {presentationLocation}
+              </p>
+              <p class="mt-1 text-3xl">RD</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="px-6 pb-24">
+      <div class="mx-auto max-w-[75rem]">
+        <div class="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <div>
+            <p class="section-eyebrow">Galeria</p>
+
+            <h2 class="mt-4 section-title">
+              {featuredSectionTitle}
+            </h2>
+
+            <p class="mt-4 max-w-2xl text-base leading-7 text-zinc-500">
+              {featuredSectionDescription}
+            </p>
+          </div>
+
+          <a href="/galeria" class="btn-ghost">
+            Ver toda la galeria ->
+          </a>
+        </div>
+
+        {
+          featuredCarouselItems.length > 0 ? (
+            <article
+              class="overflow-hidden rounded-lg border border-white/[0.08] bg-[#101315] shadow-2xl shadow-black/20"
+              data-featured-carousel
+            >
+              <div class="relative aspect-[16/10] min-h-[420px] overflow-hidden bg-zinc-950 md:aspect-[16/7]">
+                {
+                  featuredCarouselItems.map((item, index) => (
+                    <a
+                      href={`/contenido/${item.slug}`}
+                      class={`featured-slide focus-ring absolute inset-0 block ${index === 0 ? "is-active" : ""}`}
+                      data-featured-slide
+                      aria-hidden={index === 0 ? "false" : "true"}
+                      tabindex={index === 0 ? "0" : "-1"}
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        loading="eager"
+                        fetchpriority={index === 0 ? "high" : "auto"}
+                        decoding="async"
+                        width="1400"
+                        height="780"
+                        class="absolute inset-0 h-full w-full object-cover"
+                      />
+
+                      <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.84)_0%,rgba(0,0,0,0.48)_48%,rgba(0,0,0,0.1)_100%)]"></div>
+                      <div class="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/80 to-transparent"></div>
+
+                      <div class="absolute left-5 top-5 flex flex-wrap gap-2">
+                        <span class="rounded-md bg-[#00e0c7] px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-black">
+                          En rotacion
+                        </span>
+                        <span class="rounded-md border border-white/10 bg-black/65 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur">
+                          {item.type === "video" ? "Video" : "Foto"}
+                        </span>
+                      </div>
+
+                      <div class="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+                        <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#00e0c7]">
+                          {item.category}
+                        </p>
+
+                        <h3 class="mt-3 max-w-4xl text-3xl font-black leading-tight text-white md:text-6xl">
+                          {item.title}
+                        </h3>
+
+                        <p class="mt-4 max-w-2xl text-sm leading-6 text-zinc-200 md:text-base md:leading-7">
+                          {item.description}
+                        </p>
+                      </div>
+                    </a>
+                  ))
+                }
+
+                {
+                  featuredCarouselItems.length > 1 && (
+                    <div class="absolute bottom-5 right-5 z-30 flex items-center gap-3 rounded-lg border border-white/10 bg-black/65 px-4 py-3 backdrop-blur">
+                      <button
+                        type="button"
+                        class="featured-control focus-ring"
+                        data-featured-prev
+                        aria-label="Ver contenido anterior"
+                      >
+                        ←
+                      </button>
+
+                      <span
+                        class="min-w-12 text-center text-xs font-black uppercase tracking-[0.16em] text-white"
+                        data-featured-counter
+                      >
+                        1 / {featuredCarouselItems.length}
+                      </span>
+
+                      <button
+                        type="button"
+                        class="featured-control focus-ring"
+                        data-featured-next
+                        aria-label="Ver contenido siguiente"
+                      >
+                        →
+                      </button>
+                    </div>
+                  )
+                }
+              </div>
+
+              {
+                featuredCarouselItems.length > 1 && (
+                  <div class="flex flex-col gap-4 border-t border-white/[0.08] p-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <p class="text-xs font-black uppercase tracking-[0.18em] text-[#00e0c7]">
+                        Presentacion automatica
+                      </p>
+                      <p class="mt-1 text-sm text-zinc-500">
+                        El contenido cambia solo cada pocos segundos. Tambien puedes avanzar manualmente.
+                      </p>
+                    </div>
+
+                    <div class="flex gap-2" aria-label="Seleccionar contenido destacado">
+                      {featuredCarouselItems.map((item, index) => (
+                        <button
+                          type="button"
+                          class={`featured-dot focus-ring ${index === 0 ? "is-active" : ""}`}
+                          data-featured-dot
+                          data-featured-index={index}
+                          aria-label={`Ver ${item.title}`}
+                        ></button>
+                      ))}
+                    </div>
+                  </div>
+                )
+              }
+            </article>
+          ) : (
+            <div class="dark-card p-10 text-center">
+              <h3 class="text-2xl font-bold text-white">
+                No hay contenidos publicados todavia
+              </h3>
+              <p class="mt-3 text-zinc-500">
+                Publica contenido desde WordPress para mostrarlo aqui.
+              </p>
+            </div>
+          )
+        }
+      </div>
+    </section>
+
+    <section
+      id="recientes"
+      class="border-t border-white/[0.08] bg-[#101315] px-6 py-24 scroll-mt-24"
+    >
+      <div class="mx-auto max-w-[75rem]">
+        <div class="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <div>
+            <p class="section-eyebrow">Recientes</p>
+
+            <h2 class="mt-4 section-title">
+              {recentSectionTitle}
+            </h2>
+
+            {
+              recentSectionDescription && (
+                <p class="mt-4 max-w-2xl text-base leading-7 text-zinc-400">
+                  {recentSectionDescription}
+                </p>
+              )
+            }
+          </div>
+
+          <a href="/contacto" class="btn-main">
+            Solicitar material
+          </a>
+        </div>
+
+        {
+          latestContents.length > 0 ? (
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {latestContents.map((item) => (
+                <ContentCard item={item} />
+              ))}
+            </div>
+          ) : (
+            <div class="dark-card p-10 text-center">
+              <h3 class="text-2xl font-bold text-white">
+                No hay publicaciones recientes
+              </h3>
+              <p class="mt-3 text-zinc-500">
+                Agrega publicaciones desde el panel de WordPress.
+              </p>
+            </div>
+          )
+        }
+      </div>
+    </section>
+
+    <script is:inline>
+      window.__gtdFeaturedCarousel = window.__gtdFeaturedCarousel || {};
+
+      function initGtdFeaturedCarousel() {
+        const root = document.querySelector("[data-featured-carousel]");
+
+        if (!root) {
+          if (window.__gtdFeaturedCarousel.timer) {
+            window.clearInterval(window.__gtdFeaturedCarousel.timer);
+            window.__gtdFeaturedCarousel.timer = null;
+          }
+
+          return;
+        }
+
+        if (root.dataset.featuredReady === "true") {
+          return;
+        }
+
+        root.dataset.featuredReady = "true";
+
+        if (window.__gtdFeaturedCarousel.timer) {
+          window.clearInterval(window.__gtdFeaturedCarousel.timer);
+          window.__gtdFeaturedCarousel.timer = null;
+        }
+
+        const slides = Array.from(root.querySelectorAll("[data-featured-slide]"));
+        const dots = Array.from(root.querySelectorAll("[data-featured-dot]"));
+        const previousButton = root.querySelector("[data-featured-prev]");
+        const nextButton = root.querySelector("[data-featured-next]");
+        const counter = root.querySelector("[data-featured-counter]");
+
+        if (slides.length === 0) {
+          return;
+        }
+
+        let activeIndex = 0;
+
+        const activate = (nextIndex) => {
+          activeIndex = nextIndex;
+
+          slides.forEach((slide, index) => {
+            const isActive = index === activeIndex;
+
+            slide.classList.toggle("is-active", isActive);
+            slide.setAttribute("aria-hidden", isActive ? "false" : "true");
+            slide.setAttribute("tabindex", isActive ? "0" : "-1");
+          });
+
+          dots.forEach((dot, index) => {
+            dot.classList.toggle("is-active", index === activeIndex);
+            dot.setAttribute("aria-current", index === activeIndex ? "true" : "false");
+          });
+
+          if (counter) {
+            counter.textContent = `${activeIndex + 1} / ${slides.length}`;
+          }
+        };
+
+        const restartTimer = () => {
+          if (window.__gtdFeaturedCarousel.timer) {
+            window.clearInterval(window.__gtdFeaturedCarousel.timer);
+            window.__gtdFeaturedCarousel.timer = null;
+          }
+
+          const prefersReducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)",
+          ).matches;
+
+          if (slides.length < 2 || prefersReducedMotion) {
+            return;
+          }
+
+          window.__gtdFeaturedCarousel.timer = window.setInterval(() => {
+            activate((activeIndex + 1) % slides.length);
+          }, 4600);
+        };
+
+        activate(0);
+
+        dots.forEach((dot) => {
+          dot.addEventListener("click", () => {
+            const nextIndex = Number(dot.dataset.featuredIndex || 0);
+            activate(nextIndex);
+            restartTimer();
+          });
+        });
+
+        previousButton?.addEventListener("click", () => {
+          activate((activeIndex - 1 + slides.length) % slides.length);
+          restartTimer();
+        });
+
+        nextButton?.addEventListener("click", () => {
+          activate((activeIndex + 1) % slides.length);
+          restartTimer();
+        });
+
+        restartTimer();
+      }
+
+      if (!window.__gtdFeaturedCarousel.bound) {
+        document.addEventListener("astro:before-swap", () => {
+          if (window.__gtdFeaturedCarousel.timer) {
+            window.clearInterval(window.__gtdFeaturedCarousel.timer);
+            window.__gtdFeaturedCarousel.timer = null;
+          }
+        });
+
+        document.addEventListener("astro:page-load", initGtdFeaturedCarousel);
+        window.__gtdFeaturedCarousel.bound = true;
+      }
+
+      initGtdFeaturedCarousel();
+    </script>
+  </main>
+</MainLayout>

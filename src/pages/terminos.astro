@@ -1,0 +1,88 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import { siteConfig } from "../config/site";
+import { getPageBySlug } from "../lib/wordpress";
+
+const managedPage = await getPageBySlug("terminos");
+const pageTitle = managedPage?.title || "Terminos y condiciones";
+const pageExcerpt =
+  managedPage?.excerpt || `Terminos y condiciones de uso de ${siteConfig.name}.`;
+---
+
+<MainLayout
+  title={`${pageTitle} - ${siteConfig.name}`}
+  description={pageExcerpt}
+>
+  <main class="bg-[#08090a] px-6 py-16 md:py-20">
+    <div class="mx-auto max-w-4xl">
+      <p class="section-eyebrow">
+        Legal
+      </p>
+
+      <h1 class="mt-4 text-4xl font-black text-white md:text-5xl">
+        {pageTitle}
+      </h1>
+
+      {
+        managedPage?.contentHtml ? (
+          <div class="mt-10 rounded-lg border border-white/[0.08] bg-[#101315] p-6 md:p-8">
+            <div class="rich-content" set:html={managedPage.contentHtml}></div>
+          </div>
+        ) : (
+          <div class="mt-10 space-y-8 rounded-lg border border-white/[0.08] bg-[#101315] p-6 leading-8 text-zinc-400 md:p-8">
+            <section>
+              <h2 class="text-2xl font-bold text-white">1. Uso del sitio</h2>
+              <p class="mt-3">
+                Al acceder a este sitio web, el usuario acepta utilizar la plataforma de manera
+                responsable y conforme a estos terminos y condiciones.
+              </p>
+            </section>
+
+            <section>
+              <h2 class="text-2xl font-bold text-white">2. Contenido publicado</h2>
+              <p class="mt-3">
+                El sitio muestra contenido audiovisual como imagenes, videos, reels y publicaciones
+                relacionadas con actividades, entrenamientos, marchas, desfiles y contenido
+                institucional.
+              </p>
+            </section>
+
+            <section>
+              <h2 class="text-2xl font-bold text-white">3. Propiedad del contenido</h2>
+              <p class="mt-3">
+                Las imagenes, videos, textos, marcas, nombres y elementos visuales publicados en el
+                sitio pertenecen a sus respectivos propietarios o han sido publicados con fines
+                informativos, promocionales o institucionales.
+              </p>
+            </section>
+
+            <section>
+              <h2 class="text-2xl font-bold text-white">4. Uso no autorizado</h2>
+              <p class="mt-3">
+                No esta permitido copiar, distribuir, modificar o utilizar el contenido del sitio
+                con fines comerciales sin autorizacion previa cuando corresponda.
+              </p>
+            </section>
+
+            <section>
+              <h2 class="text-2xl font-bold text-white">5. Enlaces externos</h2>
+              <p class="mt-3">
+                El sitio puede incluir enlaces hacia plataformas externas. {siteConfig.name} no se
+                hace responsable por el contenido, disponibilidad o politicas de dichos sitios
+                externos.
+              </p>
+            </section>
+
+            <section>
+              <h2 class="text-2xl font-bold text-white">6. Cambios en los terminos</h2>
+              <p class="mt-3">
+                Estos terminos pueden ser modificados cuando sea necesario. Las actualizaciones
+                seran publicadas en esta misma pagina.
+              </p>
+            </section>
+          </div>
+        )
+      }
+    </div>
+  </main>
+</MainLayout>

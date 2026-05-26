@@ -1,0 +1,126 @@
+---
+import type { ContactSettings } from "../types/contact";
+import { siteConfig } from "../config/site";
+
+const navItems = [
+  {
+    label: "Home",
+    href: "/",
+  },
+  {
+    label: "Sobre nosotros",
+    href: "/sobre-nosotros",
+  },
+  {
+    label: "Galería",
+    href: "/galeria",
+  },
+  {
+    label: "Contacto",
+    href: "/contacto",
+  },
+];
+
+interface Props {
+  contactSettings: ContactSettings;
+}
+
+const { contactSettings } = Astro.props;
+const whatsappUrl = contactSettings.whatsappUrl;
+---
+
+<header class="sticky top-0 z-50 border-b border-white/[0.08] bg-[#08090a]/90 backdrop-blur-xl">
+  <div class="container-site flex h-16 items-center justify-between">
+    <a href="/" class="focus-ring flex items-center gap-3 rounded-lg">
+      <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#00e0c7] text-sm font-black text-black">
+        {siteConfig.logoText}
+      </span>
+
+      <span>
+        <span class="block text-sm font-bold text-white">{siteConfig.name}</span>
+        <span class="block text-xs text-zinc-500">{siteConfig.tagline}</span>
+      </span>
+    </a>
+
+    <nav class="hidden items-center gap-1 md:flex" aria-label="Navegación principal">
+      {
+        navItems.map((item) => (
+          <a
+            href={item.href}
+            class="focus-ring rounded-lg px-4 py-2 text-sm font-medium text-zinc-400 transition hover:bg-white/[0.05] hover:text-white"
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="hidden items-center gap-3 md:flex">
+      <a
+        href="/galeria"
+        class="focus-ring rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white transition hover:border-[#00e0c7]/40"
+      >
+        Ver galería
+      </a>
+
+      {
+        whatsappUrl ? (
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="focus-ring rounded-lg bg-[#00e0c7] px-4 py-2 text-sm font-bold text-black transition hover:bg-[#00b89f]"
+          >
+            WhatsApp
+          </a>
+        ) : (
+          <a
+            href="/contacto"
+            class="focus-ring rounded-lg bg-[#00e0c7] px-4 py-2 text-sm font-bold text-black transition hover:bg-[#00b89f]"
+          >
+            Contacto
+          </a>
+        )
+      }
+    </div>
+
+    <details class="relative md:hidden">
+      <summary class="focus-ring flex h-10 cursor-pointer list-none items-center rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 text-sm font-bold text-white">
+        Menu
+      </summary>
+
+      <div class="absolute right-0 top-12 w-64 rounded-lg border border-white/[0.08] bg-[#101315] p-2 shadow-2xl shadow-black/40">
+        {
+          navItems.map((item) => (
+            <a
+              href={item.href}
+              class="block rounded-md px-4 py-3 text-sm font-medium text-zinc-300 transition hover:bg-white/[0.05] hover:text-white"
+            >
+              {item.label}
+            </a>
+          ))
+        }
+
+        {
+          whatsappUrl ? (
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-2 block rounded-md bg-[#00e0c7] px-4 py-3 text-sm font-bold text-black"
+            >
+              WhatsApp
+            </a>
+          ) : (
+            <a
+              href="/contacto"
+              class="mt-2 block rounded-md bg-[#00e0c7] px-4 py-3 text-sm font-bold text-black"
+            >
+              Contacto
+            </a>
+          )
+        }
+      </div>
+    </details>
+  </div>
+</header>

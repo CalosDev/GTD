@@ -1,0 +1,158 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import { siteConfig } from "../config/site";
+import { getPageBySlug } from "../lib/wordpress";
+
+const managedPage = await getPageBySlug("sobre-nosotros");
+const pageTitle =
+  managedPage?.title ||
+  "Una plataforma audiovisual para documentar actividades, entrenamientos y contenido institucional";
+const pageExcerpt =
+  managedPage?.excerpt ||
+  `${siteConfig.name} nace con el objetivo de recopilar, organizar y presentar contenido visual relacionado con entrenamientos, marchas, desfiles, comandos y actividades militares en ${siteConfig.location}.`;
+---
+
+<MainLayout
+  title={`Sobre nosotros - ${siteConfig.name}`}
+  description={pageExcerpt}
+>
+  <main class="bg-[#08090a]">
+    <section class="relative overflow-hidden border-b border-white/[0.08] px-6 py-20 md:py-28">
+      <div class="absolute inset-0 bg-[linear-gradient(180deg,#101315,#08090a)]"></div>
+
+      <div class="relative z-10 mx-auto max-w-[75rem]">
+        <p class="section-eyebrow">
+          Sobre nosotros
+        </p>
+
+        <h1 class="mt-5 max-w-4xl text-4xl font-black leading-tight text-white md:text-6xl">
+          {pageTitle}
+        </h1>
+
+        <p class="mt-6 max-w-3xl text-lg leading-8 text-zinc-400">
+          {pageExcerpt}
+        </p>
+
+        <div class="mt-8 flex flex-wrap gap-4">
+          <a href="/galeria" class="btn-main">
+            Explorar contenido
+          </a>
+
+          <a href="/contacto" class="btn-ghost">
+            Contactar
+          </a>
+        </div>
+      </div>
+    </section>
+
+    {
+      managedPage?.contentHtml ? (
+        <section class="section-band">
+          <div class="container-site">
+            <div class="dark-card p-8 md:p-10">
+              <div class="rich-content" set:html={managedPage.contentHtml}></div>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <>
+          <section class="section-band">
+            <div class="container-site grid gap-5 md:grid-cols-3">
+              <div class="dark-card media-lift p-8">
+                <p class="section-eyebrow">Que hacemos</p>
+                <h2 class="mt-4 text-2xl font-bold text-white">Archivo audiovisual</h2>
+                <p class="mt-4 leading-7 text-zinc-500">
+                  Reunimos imagenes, videos y publicaciones para que el material pueda consultarse
+                  sin perderse entre redes sociales o mensajes.
+                </p>
+              </div>
+
+              <div class="dark-card media-lift p-8">
+                <p class="section-eyebrow">Como se organiza</p>
+                <h2 class="mt-4 text-2xl font-bold text-white">Categorias claras</h2>
+                <p class="mt-4 leading-7 text-zinc-500">
+                  Cada publicacion conserva titulo, categoria, ubicacion, fecha, descripcion y
+                  formato para que el visitante encuentre rapido lo que busca.
+                </p>
+              </div>
+
+              <div class="dark-card media-lift p-8">
+                <p class="section-eyebrow">Para quien</p>
+                <h2 class="mt-4 text-2xl font-bold text-white">Consulta directa</h2>
+                <p class="mt-4 leading-7 text-zinc-500">
+                  La pagina esta pensada para personas que quieren revisar contenido, compartir una
+                  publicacion o solicitar informacion sobre material disponible.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section class="border-t border-white/[0.08] bg-[#101315] px-6 py-20">
+            <div class="mx-auto grid max-w-[75rem] gap-10 md:grid-cols-2 md:items-center">
+              <div>
+                <p class="section-eyebrow">
+                  Enfoque
+                </p>
+
+                <h2 class="mt-4 text-3xl font-black leading-tight text-white md:text-4xl">
+                  Una galeria pensada para contenido visual
+                </h2>
+
+                <p class="mt-6 leading-8 text-zinc-400">
+                  La plataforma esta disenada para mostrar imagenes y videos de manera clara,
+                  rapida y organizada. Cada publicacion puede incluir titulo, descripcion,
+                  ubicacion, fecha, categoria, imagen destacada y enlace de video.
+                </p>
+              </div>
+
+              <div class="rounded-lg border border-white/[0.08] bg-[#08090a] p-8">
+                <ul class="space-y-4 text-zinc-400">
+                  <li class="border-b border-white/[0.08] pb-4">
+                    <span class="font-bold text-white">Galeria centralizada:</span> contenido
+                    reunido en una sola experiencia.
+                  </li>
+                  <li class="border-b border-white/[0.08] pb-4">
+                    <span class="font-bold text-white">Filtros utiles:</span> navegacion por
+                    formato y categoria disponible.
+                  </li>
+                  <li class="border-b border-white/[0.08] pb-4">
+                    <span class="font-bold text-white">Fichas por publicacion:</span> fecha,
+                    ubicacion, resumen y material relacionado.
+                  </li>
+                  <li>
+                    <span class="font-bold text-white">Contacto directo:</span> consultas por
+                    WhatsApp sin formularios complicados.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
+        </>
+      )
+    }
+
+    <section class="px-6 py-20">
+      <div class="mx-auto grid max-w-[75rem] gap-6 rounded-lg border border-white/[0.08] bg-[#101315] p-8 md:grid-cols-[1fr_auto] md:items-center md:p-10">
+        <div>
+          <p class="section-eyebrow">Siguiente paso</p>
+          <h2 class="mt-4 text-3xl font-black text-white">
+            Buscas una publicacion o material especifico?
+          </h2>
+          <p class="mt-4 max-w-2xl leading-7 text-zinc-400">
+            Puedes explorar la galeria o escribir directamente para consultar disponibilidad de
+            contenido.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-3 md:justify-end">
+          <a href="/galeria" class="btn-ghost">
+            Ver galeria
+          </a>
+          <a href="/contacto" class="btn-main">
+            Solicitar informacion
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</MainLayout>

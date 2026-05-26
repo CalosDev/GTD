@@ -1,0 +1,80 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import GalleryFilters from "../components/GalleryFilters.jsx";
+import { siteConfig } from "../config/site";
+import { getContents } from "../lib/wordpress";
+
+const contents = await getContents();
+
+const totalContents = contents.length;
+const totalImages = contents.filter((item) => item.type === "imagen").length;
+const totalCategories = new Set(contents.map((item) => item.category)).size;
+
+const siteUrl = siteConfig.url;
+---
+
+<MainLayout
+  title={`Galería - ${siteConfig.name}`}
+  description="Explora imágenes, videos, reels y contenido audiovisual de entrenamientos, marchas, desfiles y actividades militares."
+  url={`${siteUrl}/galeria`}
+>
+  <main class="bg-[#08090a]">
+    <section class="relative overflow-hidden border-b border-white/[0.08] px-6 py-16 md:py-20">
+      <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(17,17,17,1),rgba(10,10,10,1))]"></div>
+      <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#08090a] to-transparent"></div>
+
+      <div class="relative z-10 mx-auto max-w-[75rem]">
+        <div class="grid gap-10 lg:grid-cols-[1fr_360px] lg:items-end">
+          <div class="max-w-4xl">
+            <div class="mb-6 inline-flex items-center gap-3 rounded-lg border border-[#00e0c7]/30 bg-[#00e0c7]/10 px-4 py-2">
+            <span class="h-2 w-2 rounded-full bg-[#00e0c7]"></span>
+            <span class="text-xs font-bold uppercase tracking-[0.18em] text-[#00e0c7]">
+              Galería audiovisual
+            </span>
+            </div>
+
+            <h1 class="text-5xl font-black leading-[0.98] text-white md:text-7xl">
+              Explora el
+              <br />
+              <span class="text-[#00e0c7]">contenido</span>
+            </h1>
+
+            <p class="mt-6 max-w-2xl text-lg leading-8 text-zinc-400">
+              Imágenes, videos, reels y publicaciones organizadas por categorías
+              para consultar contenido visual de manera rápida y sencilla.
+            </p>
+          </div>
+
+          <div class="rounded-lg border border-white/[0.08] bg-[#101315] p-5">
+            <p class="text-xs font-black uppercase tracking-[0.18em] text-zinc-600">
+              Resumen
+            </p>
+
+            <div class="mt-5 grid grid-cols-3 gap-3">
+              <div>
+                <p class="text-3xl font-black text-white">{totalContents}</p>
+                <p class="mt-1 text-xs text-zinc-500">Publicaciones</p>
+              </div>
+
+              <div>
+                <p class="text-3xl font-black text-white">{totalImages}</p>
+                <p class="mt-1 text-xs text-zinc-500">Fotos</p>
+              </div>
+
+              <div>
+                <p class="text-3xl font-black text-white">{totalCategories}</p>
+                <p class="mt-1 text-xs text-zinc-500">Categorías</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="px-6 py-10 md:py-14">
+      <div class="mx-auto max-w-[75rem]">
+        <GalleryFilters contents={contents} client:load />
+      </div>
+    </section>
+  </main>
+</MainLayout>
