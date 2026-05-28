@@ -16,7 +16,7 @@ Crear `.env` local:
 
 ```env
 WP_API_URL=http://wordpress.local
-PUBLIC_SITE_URL=http://localhost:4321
+PUBLIC_SITE_URL=http://localhost:
 PUBLIC_SITE_NAME=GTD Agency
 PUBLIC_SITE_LOGO_TEXT=GTD
 PUBLIC_SITE_TAGLINE=Galeria audiovisual
