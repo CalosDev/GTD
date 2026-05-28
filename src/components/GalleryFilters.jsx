@@ -108,7 +108,7 @@ export default function GalleryFilters({ contents }) {
             type="search"
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
-            placeholder="Buscar por título, categoría, ubicación..."
+            placeholder="Buscar por título, categoría o ubicación..."
             className="min-h-12 w-full rounded-lg border border-white/[0.08] bg-black/40 px-4 text-sm font-medium text-white outline-none transition placeholder:text-zinc-600 focus:border-[#00e0c7]/60"
           />
 
@@ -171,11 +171,11 @@ export default function GalleryFilters({ contents }) {
       {filteredContents.length === 0 && (
         <div className="mt-10 rounded-lg border border-white/[0.08] bg-[#101315] p-10 text-center">
           <h3 className="text-2xl font-black text-white">
-            No hay contenido disponible
+            Aún no hay contenido para mostrar
           </h3>
 
           <p className="mt-3 text-zinc-500">
-            Intenta con otro filtro o cambia el término de búsqueda.
+            Prueba con otro filtro o ajusta la búsqueda.
           </p>
         </div>
       )}
@@ -186,7 +186,11 @@ export default function GalleryFilters({ contents }) {
 function GalleryGridCard({ item }) {
   return (
     <article className="group overflow-hidden rounded-lg border border-white/[0.08] bg-[#101315] transition duration-300 hover:-translate-y-1 hover:border-[#00e0c7]/40 hover:shadow-2xl hover:shadow-[#00e0c7]/5">
-      <a href={`/contenido/${item.slug}`} className="block rounded-lg" aria-label={`Ver contenido: ${item.title}`}>
+      <a
+        href={`/contenido/${item.slug}`}
+        className="block rounded-lg"
+        aria-label={`Ver contenido: ${item.title}`}
+      >
         <div className="relative aspect-[4/3] overflow-hidden bg-zinc-950">
           <img
             src={item.image}
@@ -241,7 +245,11 @@ function GalleryGridCard({ item }) {
 function GalleryListCard({ item }) {
   return (
     <article className="group overflow-hidden rounded-lg border border-white/[0.08] bg-[#101315] transition duration-300 hover:border-[#00e0c7]/40">
-      <a href={`/contenido/${item.slug}`} className="grid gap-5 rounded-lg p-4 md:grid-cols-[220px_1fr] md:items-center" aria-label={`Ver contenido: ${item.title}`}>
+      <a
+        href={`/contenido/${item.slug}`}
+        className="grid gap-5 rounded-lg p-4 md:grid-cols-[220px_1fr] md:items-center"
+        aria-label={`Ver contenido: ${item.title}`}
+      >
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-zinc-950">
           <img
             src={item.image}

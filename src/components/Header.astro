@@ -3,22 +3,10 @@ import type { ContactSettings } from "../types/contact";
 import { siteConfig } from "../config/site";
 
 const navItems = [
-  {
-    label: "Home",
-    href: "/",
-  },
-  {
-    label: "Sobre nosotros",
-    href: "/sobre-nosotros",
-  },
-  {
-    label: "Galería",
-    href: "/galeria",
-  },
-  {
-    label: "Contacto",
-    href: "/contacto",
-  },
+  { label: "Inicio", href: "/" },
+  { label: "Sobre nosotros", href: "/sobre-nosotros" },
+  { label: "Galería", href: "/galeria" },
+  { label: "Contacto", href: "/contacto" },
 ];
 
 interface Props {
@@ -27,6 +15,7 @@ interface Props {
 
 const { contactSettings } = Astro.props;
 const whatsappUrl = contactSettings.whatsappUrl;
+const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
 ---
 
 <header class="sticky top-0 z-50 border-b border-white/[0.08] bg-[#08090a]/90 backdrop-blur-xl">
@@ -44,14 +33,24 @@ const whatsappUrl = contactSettings.whatsappUrl;
 
     <nav class="hidden items-center gap-1 md:flex" aria-label="Navegación principal">
       {
-        navItems.map((item) => (
-          <a
-            href={item.href}
-            class="focus-ring rounded-lg px-4 py-2 text-sm font-medium text-zinc-400 transition hover:bg-white/[0.05] hover:text-white"
-          >
-            {item.label}
-          </a>
-        ))
+        navItems.map((item) => {
+          const isActive = item.href === pathname || (item.href === "/" && pathname === "/");
+
+          return (
+            <a
+              href={item.href}
+              aria-current={isActive ? "page" : undefined}
+              class:list={[
+                "focus-ring rounded-lg px-4 py-2 text-sm font-medium transition",
+                isActive
+                  ? "bg-white/[0.06] text-white"
+                  : "text-zinc-400 hover:bg-white/[0.05] hover:text-white",
+              ]}
+            >
+              {item.label}
+            </a>
+          );
+        })
       }
     </nav>
 
@@ -86,19 +85,29 @@ const whatsappUrl = contactSettings.whatsappUrl;
 
     <details class="relative md:hidden">
       <summary class="focus-ring flex h-10 cursor-pointer list-none items-center rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 text-sm font-bold text-white">
-        Menu
+        Menú
       </summary>
 
       <div class="absolute right-0 top-12 w-64 rounded-lg border border-white/[0.08] bg-[#101315] p-2 shadow-2xl shadow-black/40">
         {
-          navItems.map((item) => (
-            <a
-              href={item.href}
-              class="block rounded-md px-4 py-3 text-sm font-medium text-zinc-300 transition hover:bg-white/[0.05] hover:text-white"
-            >
-              {item.label}
-            </a>
-          ))
+          navItems.map((item) => {
+            const isActive = item.href === pathname || (item.href === "/" && pathname === "/");
+
+            return (
+              <a
+                href={item.href}
+                aria-current={isActive ? "page" : undefined}
+                class:list={[
+                  "block rounded-md px-4 py-3 text-sm font-medium transition",
+                  isActive
+                    ? "bg-white/[0.06] text-white"
+                    : "text-zinc-300 hover:bg-white/[0.05] hover:text-white",
+                ]}
+              >
+                {item.label}
+              </a>
+            );
+          })
         }
 
         {

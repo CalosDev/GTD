@@ -60,6 +60,22 @@ const previousContent = hasNavigation
 const nextContent = hasNavigation
   ? contents[(currentIndex + 1) % contents.length]
   : undefined;
+const navigationItems = hasNavigation
+  ? previousContent && nextContent && previousContent.slug === nextContent.slug
+    ? [{ label: "Otra publicacion", content: nextContent }]
+    : [
+        previousContent
+          ? { label: "Anterior", content: previousContent }
+          : undefined,
+        nextContent ? { label: "Siguiente", content: nextContent } : undefined,
+      ].filter(Boolean)
+  : [];
+const relatedGridClass =
+  finalRelatedContents.length === 1
+    ? "max-w-[24rem]"
+    : finalRelatedContents.length === 2
+      ? "md:grid-cols-2 lg:max-w-[52rem]"
+      : "md:grid-cols-3";
 ---
 
 <MainLayout
@@ -195,8 +211,10 @@ const nextContent = hasNavigation
               {
                 isVideo && (
                   <div class="absolute inset-0 flex items-center justify-center bg-black/10">
-                    <span class="flex h-16 w-16 items-center justify-center rounded-full border border-white/20 bg-black/70 text-xl font-black text-white backdrop-blur">
-                      ▶
+                    <span class="flex h-16 w-16 items-center justify-center rounded-full border border-white/20 bg-black/70 text-white backdrop-blur">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" class="ml-1 h-6 w-6 fill-current">
+                        <path d="M8 6v12l10-6z" />
+                      </svg>
                     </span>
                   </div>
                 )
@@ -306,38 +324,24 @@ const nextContent = hasNavigation
           </div>
 
           {
-            hasNavigation && (
+            navigationItems.length > 0 && (
               <div class="mt-5 rounded-lg border border-white/[0.08] bg-[#101315] p-6">
                 <p class="section-eyebrow">Navegar</p>
 
                 <div class="mt-5 grid gap-3">
-                  {previousContent && (
+                  {navigationItems.map(({ label, content }) => (
                     <a
-                      href={`/contenido/${previousContent.slug}`}
+                      href={`/contenido/${content.slug}`}
                       class="rounded-lg border border-white/[0.08] bg-white/[0.035] p-4 transition hover:border-[#00e0c7]/40"
                     >
                       <p class="text-xs font-black uppercase tracking-[0.18em] text-zinc-600">
-                        Anterior
+                        {label}
                       </p>
                       <p class="mt-2 line-clamp-2 font-bold text-white">
-                        {previousContent.title}
+                        {content.title}
                       </p>
                     </a>
-                  )}
-
-                  {nextContent && (
-                    <a
-                      href={`/contenido/${nextContent.slug}`}
-                      class="rounded-lg border border-white/[0.08] bg-white/[0.035] p-4 transition hover:border-[#00e0c7]/40"
-                    >
-                      <p class="text-xs font-black uppercase tracking-[0.18em] text-zinc-600">
-                        Siguiente
-                      </p>
-                      <p class="mt-2 line-clamp-2 font-bold text-white">
-                        {nextContent.title}
-                      </p>
-                    </a>
-                  )}
+                  ))}
                 </div>
               </div>
             )
@@ -364,7 +368,7 @@ const nextContent = hasNavigation
 
         {
           finalRelatedContents.length > 0 ? (
-            <div class="grid gap-6 md:grid-cols-3">
+            <div class:list={["grid gap-6", relatedGridClass]}>
               {finalRelatedContents.map((content) => (
                 <ContentCard item={content} />
               ))}
@@ -377,7 +381,7 @@ const nextContent = hasNavigation
                   Todavia no hay publicaciones relacionadas
                 </h3>
                 <p class="mt-3 max-w-2xl leading-7 text-zinc-500">
-                  Cuando WordPress tenga mas contenido de esta categoria, se mostrara aqui automaticamente.
+                  Cuando haya mas contenido de esta categoria, se mostrara aqui automaticamente.
                 </p>
               </div>
 

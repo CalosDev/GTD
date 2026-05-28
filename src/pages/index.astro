@@ -79,11 +79,18 @@ const featuredSectionDescription =
   "Una seleccion rapida del material principal para entrar directo a las publicaciones mas relevantes.";
 const recentSectionTitle = homeRecentPage?.title || "Ultimas publicaciones";
 const recentSectionDescription = homeRecentPage?.excerpt || "";
+const latestGridClass =
+  latestContents.length === 1
+    ? "max-w-[24rem]"
+    : latestContents.length === 2
+      ? "sm:grid-cols-2 lg:max-w-[52rem]"
+      : "sm:grid-cols-2 lg:grid-cols-3";
 ---
 
 <MainLayout
   title={`${siteConfig.name} - ${siteConfig.tagline}`}
   description={heroDescription || siteConfig.description}
+  image={heroContent?.image || siteConfig.defaultImage}
   url={siteUrl}
 >
   <main class="bg-[#08090a]">
@@ -239,8 +246,16 @@ const recentSectionDescription = homeRecentPage?.excerpt || "";
             <div class="grid gap-5 md:grid-cols-3">
               <article class="dark-card media-lift p-8">
                 <div class="mb-8 flex items-start justify-between">
-                  <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-[#00e0c7]/10 text-2xl">
-                    🏋️
+                  <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-[#00e0c7]/10 text-[#00e0c7]">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" class="h-6 w-6 fill-none stroke-current" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 10v4" />
+                      <path d="M6 8v8" />
+                      <path d="M9 9v6" />
+                      <path d="M15 9v6" />
+                      <path d="M18 8v8" />
+                      <path d="M21 10v4" />
+                      <path d="M9 12h6" />
+                    </svg>
                   </div>
                   <span class="text-xs font-bold text-zinc-700">
                     {trainingCount > 0 ? trainingCount : "Nuevo"}
@@ -257,8 +272,12 @@ const recentSectionDescription = homeRecentPage?.excerpt || "";
 
               <article class="dark-card media-lift p-8">
                 <div class="mb-8 flex items-start justify-between">
-                  <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-[#00e0c7]/10 text-2xl">
-                    🎖️
+                  <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-[#00e0c7]/10 text-[#00e0c7]">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" class="h-6 w-6 fill-none stroke-current" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M8 3h8" />
+                      <path d="M9 3v6l3 2 3-2V3" />
+                      <path d="M12 11 8.5 13.5 10 18l2-1.6L14 18l1.5-4.5z" />
+                    </svg>
                   </div>
                   <span class="text-xs font-bold text-zinc-700">
                     {marchCount > 0 ? marchCount : "Nuevo"}
@@ -275,8 +294,10 @@ const recentSectionDescription = homeRecentPage?.excerpt || "";
 
               <article class="dark-card media-lift p-8">
                 <div class="mb-8 flex items-start justify-between">
-                  <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-[#00e0c7]/10 text-2xl">
-                    ⚡
+                  <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-[#00e0c7]/10 text-[#00e0c7]">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" class="h-6 w-6 fill-none stroke-current" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M13 2 6 13h5l-1 9 8-12h-5l0-8z" />
+                    </svg>
                   </div>
                   <span class="text-xs font-bold text-zinc-700">
                     {activityCount > 0 ? activityCount : "Nuevo"}
@@ -352,7 +373,7 @@ const recentSectionDescription = homeRecentPage?.excerpt || "";
                   <img
                     src={presentationContent.image}
                     alt={presentationContent.title}
-                    loading="lazy"
+                    loading="eager"
                     decoding="async"
                     width="900"
                     height="700"
@@ -450,36 +471,6 @@ const recentSectionDescription = homeRecentPage?.excerpt || "";
                   ))
                 }
 
-                {
-                  featuredCarouselItems.length > 1 && (
-                    <div class="absolute bottom-5 right-5 z-30 flex items-center gap-3 rounded-lg border border-white/10 bg-black/65 px-4 py-3 backdrop-blur">
-                      <button
-                        type="button"
-                        class="featured-control focus-ring"
-                        data-featured-prev
-                        aria-label="Ver contenido anterior"
-                      >
-                        ←
-                      </button>
-
-                      <span
-                        class="min-w-12 text-center text-xs font-black uppercase tracking-[0.16em] text-white"
-                        data-featured-counter
-                      >
-                        1 / {featuredCarouselItems.length}
-                      </span>
-
-                      <button
-                        type="button"
-                        class="featured-control focus-ring"
-                        data-featured-next
-                        aria-label="Ver contenido siguiente"
-                      >
-                        →
-                      </button>
-                    </div>
-                  )
-                }
               </div>
 
               {
@@ -494,16 +485,49 @@ const recentSectionDescription = homeRecentPage?.excerpt || "";
                       </p>
                     </div>
 
-                    <div class="flex gap-2" aria-label="Seleccionar contenido destacado">
-                      {featuredCarouselItems.map((item, index) => (
+                    <div class="flex flex-col gap-3 md:items-end">
+                      <div class="flex items-center gap-3 self-start md:self-auto">
                         <button
                           type="button"
-                          class={`featured-dot focus-ring ${index === 0 ? "is-active" : ""}`}
-                          data-featured-dot
-                          data-featured-index={index}
-                          aria-label={`Ver ${item.title}`}
-                        ></button>
-                      ))}
+                          class="featured-control focus-ring"
+                          data-featured-prev
+                          aria-label="Ver contenido anterior"
+                        >
+                          <svg viewBox="0 0 20 20" aria-hidden="true" class="h-4 w-4 fill-none stroke-current" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12.5 4.5 7 10l5.5 5.5" />
+                          </svg>
+                        </button>
+
+                        <span
+                          class="min-w-12 text-center text-xs font-black uppercase tracking-[0.16em] text-white"
+                          data-featured-counter
+                        >
+                          1 / {featuredCarouselItems.length}
+                        </span>
+
+                        <button
+                          type="button"
+                          class="featured-control focus-ring"
+                          data-featured-next
+                          aria-label="Ver contenido siguiente"
+                        >
+                          <svg viewBox="0 0 20 20" aria-hidden="true" class="h-4 w-4 fill-none stroke-current" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7.5 4.5 13 10l-5.5 5.5" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      <div class="flex flex-wrap gap-2" aria-label="Seleccionar contenido destacado">
+                        {featuredCarouselItems.map((item, index) => (
+                          <button
+                            type="button"
+                            class={`featured-dot focus-ring ${index === 0 ? "is-active" : ""}`}
+                            data-featured-dot
+                            data-featured-index={index}
+                            aria-label={`Ver ${item.title}`}
+                          ></button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )
@@ -512,10 +536,10 @@ const recentSectionDescription = homeRecentPage?.excerpt || "";
           ) : (
             <div class="dark-card p-10 text-center">
               <h3 class="text-2xl font-bold text-white">
-                No hay contenidos publicados todavia
+                Aún no hay contenidos publicados
               </h3>
               <p class="mt-3 text-zinc-500">
-                Publica contenido desde WordPress para mostrarlo aqui.
+                Cuando haya publicaciones, se mostrarán aquí automáticamente.
               </p>
             </div>
           )
@@ -552,7 +576,7 @@ const recentSectionDescription = homeRecentPage?.excerpt || "";
 
         {
           latestContents.length > 0 ? (
-            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div class:list={["grid gap-6", latestGridClass]}>
               {latestContents.map((item) => (
                 <ContentCard item={item} />
               ))}
@@ -560,10 +584,10 @@ const recentSectionDescription = homeRecentPage?.excerpt || "";
           ) : (
             <div class="dark-card p-10 text-center">
               <h3 class="text-2xl font-bold text-white">
-                No hay publicaciones recientes
+                Todavía no hay publicaciones recientes
               </h3>
               <p class="mt-3 text-zinc-500">
-                Agrega publicaciones desde el panel de WordPress.
+                Las nuevas publicaciones aparecerán aquí automáticamente.
               </p>
             </div>
           )

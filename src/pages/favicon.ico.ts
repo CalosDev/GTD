@@ -1,0 +1,14 @@
+const faviconSvg = String.raw`<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="16" fill="#0f1115"></rect>
+  <circle cx="32" cy="32" r="22" fill="#15803d"></circle>
+  <text x="32" y="38" text-anchor="middle" font-size="16" font-family="Arial, sans-serif" font-weight="700" fill="white">GTD</text>
+</svg>`;
+
+export function GET() {
+  return new Response(faviconSvg, {
+    headers: {
+      "Content-Type": "image/svg+xml; charset=utf-8",
+      "Cache-Control": "public, max-age=86400",
+    },
+  });
+}
