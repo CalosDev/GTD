@@ -68,6 +68,8 @@ https://cms.tudominio.com/wp-json/wp/v2/contenido_audiovisual
 - `privacidad`
 - `terminos`
 
+Los slugs `home-hero` y `home-presentation` deben ser entradas del tipo `contenido_audiovisual`, no assets del frontend. Sus imagenes deben salir de `Imagen destacada` en WordPress.
+
 4. El repo ya esta en GitHub, GitLab o Bitbucket.
 
 ## 4. Variables de entorno
@@ -96,6 +98,9 @@ Reglas criticas:
 - `WP_API_URL` nunca debe quedar en `.local`
 - `PUBLIC_SITE_URL` debe ser la URL final del frontend
 - `PUBLIC_SHOW_DEMO_CONTENT` debe quedar en `false`
+- no versionar imagenes de contenido del cliente dentro de `public/media` o carpetas similares
+
+Las imagenes de contenido viven en WordPress, normalmente bajo `wp-content/uploads`, y Astro las consume por REST durante el build.
 
 ## 5. Deploy del frontend en Render Static Site
 
@@ -223,6 +228,13 @@ Dispara rebuild cuando cambie:
 
 Tambien debe dispararse si una entrada publicada pasa a borrador, se despublica, se manda a papelera o se elimina.
 
+Nota sobre imagenes:
+
+- Cambiar la `Imagen destacada` de una entrada o pagina monitoreada dispara rebuild porque se guarda esa entrada o pagina.
+- Cambiar solo un archivo en `Medios` puede no disparar rebuild con el snippet actual.
+- Si el cliente reemplaza una imagen desde la biblioteca de `Medios`, debe actualizar tambien la entrada o pagina que la usa.
+- Si se necesita soporte para rebuild por edicion de attachments, agregalo deliberadamente al hook y valida que no dispare builds excesivos.
+
 No hace falta dispararlo por:
 
 - revisiones
@@ -259,6 +271,7 @@ Tambien valida:
 - que no haya imagenes rotas
 - que los slugs especiales no aparezcan en galeria
 - que hero y presentacion sigan usando sus slots reservados
+- que las imagenes visibles del home salgan desde WordPress, no desde archivos agregados al frontend
 - que WhatsApp y redes salgan desde la pagina `contacto`
 
 ## 8. Prueba real del rebuild automatico
@@ -369,6 +382,7 @@ Tambien necesitas deploy por contenido WordPress, pero ese deploy debe ser autom
 12. paginas editoriales correctas
 13. detalle de contenido correcto
 14. dominio y SSL correctos
+15. no hay imagenes de contenido del cliente versionadas en el repo
 
 ## 13. Problemas comunes
 

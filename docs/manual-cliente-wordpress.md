@@ -8,6 +8,7 @@ Desde WordPress puedes cambiar:
 
 - Publicaciones de la galeria
 - Imagenes y videos del home
+- Imagenes destacadas de cada publicacion
 - Textos principales del home
 - Pagina "Sobre nosotros"
 - Pagina "Contacto"
@@ -33,6 +34,9 @@ No debes cambiar por tu cuenta:
 - Diseno general del frontend
 - Menu principal del frontend Astro
 - Logica de botones, filtros y animaciones
+- Carpetas internas del frontend, como `public`, `src` o archivos de Astro
+
+Las imagenes de contenido no se suben al frontend. Siempre se suben a WordPress y se asignan como `Imagen destacada`.
 
 Si necesitas cambiar eso, se le pide al developer.
 
@@ -145,6 +149,12 @@ Escribe:
 4. Confirma la seleccion.
 
 La imagen destacada es obligatoria para que la publicacion se vea bien en la web.
+
+Importante:
+
+- Si quieres cambiar la imagen visible en la web, cambia la `Imagen destacada` de la publicacion.
+- No basta con subir una imagen nueva a `Medios` si no la asignas a una publicacion o pagina.
+- Despues de elegir la imagen destacada, haz clic en `Actualizar` o `Publicar`.
 
 ## 7. Llenar los campos personalizados de la publicacion
 
@@ -286,6 +296,9 @@ Controla:
 - El slug debe seguir siendo `home-hero`.
 - No conviertas esta publicacion en una publicacion normal de galeria.
 - No cambies el slug a otro nombre.
+- Para cambiar la imagen del hero, reemplaza la `Imagen destacada` de esta publicacion.
+- No subas la imagen del hero a Astro ni al frontend.
+- Despues de cambiar la imagen, haz clic en `Actualizar`.
 
 ## 12. Como cambiar la seccion de presentacion del home
 
@@ -318,6 +331,8 @@ Controla:
 ### Regla critica
 
 - No cambies el slug `home-presentation`.
+- Para cambiar la imagen de esta seccion, reemplaza la `Imagen destacada` de `home-presentation`.
+- Despues de cambiar la imagen, haz clic en `Actualizar`.
 
 ## 13. Como cambiar los textos fijos del home
 
@@ -491,6 +506,23 @@ Buenas practicas:
 - evitar imagenes extremadamente pequenas
 - evitar recortes donde no se vea el sujeto principal
 
+### Como reemplazar una imagen que ya aparece en la web
+
+1. Ve a la publicacion o pagina que controla esa imagen.
+2. Entra a editar.
+3. Cambia la `Imagen destacada`.
+4. Haz clic en `Actualizar`.
+5. Espera el rebuild automatico.
+6. Revisa la web.
+
+No hagas solo esto:
+
+- subir una imagen nueva en `Medios`
+- reemplazar un archivo desde la biblioteca
+- borrar una imagen antigua
+
+Eso puede no actualizar la web si no guardas tambien la publicacion o pagina que usa esa imagen.
+
 ## 18. Como subir videos correctamente
 
 Antes de usar un video:
@@ -530,6 +562,7 @@ Revisa:
 4. que la imagen destacada exista
 5. que no estes editando otra entrada parecida
 6. que ya hayan pasado unos minutos desde la publicacion
+7. que no hayas cambiado solo la biblioteca de `Medios` sin actualizar la publicacion correspondiente
 
 Si despues de esperar sigue sin verse, avisa al developer porque puede haber fallado el rebuild automatico.
 
@@ -565,12 +598,13 @@ Si vas a actualizar una campana o una tanda nueva de contenido, hazlo en este or
 
 1. Subir imagenes y videos a Medios
 2. Crear o editar publicaciones del tipo `contenido_audiovisual`
-3. Marcar destacados
-4. Actualizar `home-hero` si el home principal cambia
-5. Actualizar `home-presentation` si esa seccion cambia
-6. Actualizar `home-overview`, `home-featured` y `home-recent` si el texto cambia
-7. Esperar unos minutos
-8. Revisar la web publica
+3. Asignar `Imagen destacada` a cada publicacion
+4. Marcar destacados
+5. Actualizar `home-hero` si el home principal cambia
+6. Actualizar `home-presentation` si esa seccion cambia
+7. Actualizar `home-overview`, `home-featured` y `home-recent` si el texto cambia
+8. Esperar unos minutos
+9. Revisar la web publica
 
 ## 22. Checklist final antes de cerrar sesion
 

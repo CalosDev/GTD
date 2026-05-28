@@ -16,7 +16,7 @@ Crear `.env` local:
 
 ```env
 WP_API_URL=http://wordpress.local
-PUBLIC_SITE_URL=http://localhost:
+PUBLIC_SITE_URL=http://localhost:4321
 PUBLIC_SITE_NAME=GTD Agency
 PUBLIC_SITE_LOGO_TEXT=GTD
 PUBLIC_SITE_TAGLINE=Galeria audiovisual
@@ -48,6 +48,8 @@ Se controlan con publicaciones reservadas del tipo `contenido_audiovisual`:
 - `home-presentation`
 
 Estas publicaciones no salen en la galeria publica. Se usan solo para el home.
+
+Las imagenes de esos bloques deben cambiarse desde WordPress usando `Imagen destacada`. No se deben subir imagenes de contenido del cliente al frontend ni versionarlas en `public/media`.
 
 ### Paginas editoriales
 
@@ -86,6 +88,13 @@ npm run build
 ```
 
 El resultado sale en `dist/`.
+
+## Medios
+
+- Las imagenes y videos editoriales viven en WordPress.
+- Astro consume esas URLs durante el build.
+- No versionar fotos del cliente en el repo salvo que sean assets globales del sitio, como favicon u OG fallback.
+- Si cambias una imagen desde `Medios` en WordPress, actualiza tambien la entrada o pagina que la usa para que el rebuild automatico se dispare.
 
 ## Produccion
 
